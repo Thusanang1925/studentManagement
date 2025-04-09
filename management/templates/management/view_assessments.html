@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Assessments{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">{% if is_tutor %}Your Created Assessments{% else %}Your Assessments{% endif %}</h4>
+        {% if is_tutor %}
+            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createAssessmentModal">
+                <i class="fas fa-plus me-2"></i>Create Assessment
+            </button>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if assessments %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Title</th>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            {% if is_tutor %}
+                                <th>Actions</th>
+                            {% else %}
+                                <th>Marks</th>
+                            {% endif %}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for assessment in assessments %}
+                            <tr>
+                                <td>{{ assessment.title }}</td>
+                                <td>{{ assessment.subject }}</td>
+                                <td>{{ assessment.date|date:"M d, Y" }}</td>
+                                {% if is_tutor %}
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <a href="{% url 'add_marks' assessment.id %}" class="btn btn-sm btn-success">
+                                                <i class="fas fa-plus"></i> Add Marks
+                                            </a>
+                                            <button class="btn btn-sm btn-warning">
+                                                <i class="fas fa-edit"></i> Edit
+                                            </button>
+                                            <button class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i> Delete
+                                            </button>
+                                        </div>
+                                    </td>
+                                {% else %}
+                                    <td>
+                                        {% for mark in assessment.mark_set.all %}
+                                            {% if mark.student.user == user %}
+                                                {{ mark.marks_obtained }}/{{ assessment.max_marks }}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <p class="text-muted">No assessments found.</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

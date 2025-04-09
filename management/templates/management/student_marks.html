@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Your Marks{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h4 class="mb-0">Your Assessment Marks</h4>
+    </div>
+    <div class="card-body">
+        {% if marks_with_percentages %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Assessment</th>
+                            <th>Subject</th>
+                            <th>Date</th>
+                            <th>Your Marks</th>
+                            <th>Maximum Marks</th>
+                            <th>Percentage</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in marks_with_percentages %}
+                            <tr>
+                                <td>{{ item.mark.assessment.title }}</td>
+                                <td>{{ item.mark.assessment.subject }}</td>
+                                <td>{{ item.mark.assessment.date|date:"M d, Y" }}</td>
+                                <td>
+                                    <span class="badge {% if item.percentage >= 70 %}bg-success{% elif item.percentage >= 40 %}bg-warning{% else %}bg-danger{% endif %}">
+                                        {{ item.mark.marks_obtained }}
+                                    </span>
+                                </td>
+                                <td>{{ item.mark.assessment.max_marks }}</td>
+                                <td>
+                                    <div class="progress" style="height: 20px">
+                                        <div class="progress-bar {% if item.percentage >= 70 %}bg-success{% elif item.percentage >= 40 %}bg-warning{% else %}bg-danger{% endif %}"
+                                             role="progressbar"
+                                             style="width: {{ item.percentage }}%"
+                                             aria-valuenow="{{ item.percentage }}"
+                                             aria-valuemin="0"
+                                             aria-valuemax="100"
+                                             title="{{ item.percentage }}%">
+                                            {{ item.percentage }}%
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                <i class="fas fa-info-circle me-2"></i>
+                You don't have any marks recorded yet.
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

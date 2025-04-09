@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Student Management System{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4a90e2;
+            --secondary-color: #f5f6fa;
+            --accent-color: #5c7cfa;
+            --success-color: #51cf66;
+            --danger-color: #ff6b6b;
+            --warning-color: #ffd43b;
+            --text-primary: #2d3436;
+            --text-secondary: #636e72;
+            --border-color: #e9ecef;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            color: var(--text-primary);
+            background-color: #f8f9fa;
+        }
+
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color), var(--accent-color)) !important;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            padding: 0.75rem 1.5rem;
+        }
+
+        .navbar-brand {
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .btn-link.nav-link {
+            color: rgba(255, 255, 255, 0.9);
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            margin: 0;
+            border: none;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+
+        .btn-link.nav-link:hover {
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        #sidebar {
+            min-height: calc(100vh - 61px);
+            background-color: white;
+            border-right: 1px solid var(--border-color);
+            padding: 1.5rem 1rem;
+            box-shadow: 2px 0 5px rgba(0,0,0,0.02);
+        }
+
+        #sidebar .nav-link {
+            color: var(--text-primary);
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+        }
+
+        #sidebar .nav-link i {
+            width: 20px;
+            margin-right: 0.75rem;
+            font-size: 1rem;
+            color: var(--text-secondary);
+        }
+
+        #sidebar .nav-link:hover,
+        #sidebar button.nav-link:hover {
+            background-color: var(--secondary-color);
+            color: var(--primary-color);
+            transform: translateX(4px);
+        }
+
+        #sidebar .nav-link:hover i {
+            color: var(--primary-color);
+        }
+
+        #sidebar .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        #sidebar .nav-link.active i {
+            color: white;
+        }
+
+        #sidebar button.nav-link {
+            background: none;
+            border: none;
+            width: 100%;
+            text-align: left;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        #sidebar button.nav-link:focus {
+            outline: none;
+            box-shadow: none;
+        }
+
+        #sidebar hr {
+            margin: 1rem 0;
+            opacity: 0.1;
+        }
+
+        .main-content {
+            padding: 2rem;
+            background-color: #f8f9fa;
+        }
+
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            background: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .card-header {
+            border-bottom: 1px solid var(--border-color);
+            padding: 1.25rem;
+            background-color: white;
+            border-radius: 12px 12px 0 0 !important;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .alert {
+            border: none;
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        .btn {
+            padding: 0.5rem 1rem;
+            font-weight: 500;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+        }
+
+        .btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        @media (max-width: 768px) {
+            #sidebar {
+                min-height: auto;
+                border-right: none;
+                border-bottom: 1px solid var(--border-color);
+                margin-bottom: 1rem;
+            }
+
+            .main-content {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="{% url 'home' %}">Student Management</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if user.is_authenticated %}
+                        <li class="nav-item">
+                            <form method="post" action="{% url 'logout' %}" class="nav-link p-0">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-light">Logout</button>
+                            </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register_student' %}">Student Register</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{% url 'register_tutor' %}">Tutor Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="{% if user.is_authenticated %}container-fluid{% else %}container mt-4{% endif %}">
+        {% if user.is_authenticated %}
+        <div class="row">
+            <!-- Sidebar -->
+            <div class="col-md-3 col-lg-2" id="sidebar">
+                <div class="nav flex-column">
+                    <a href="{% url 'home' %}" class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}">
+                        <i class="fas fa-home me-2"></i>Dashboard
+                    </a>
+                    
+                    <!-- View Links -->
+                    <hr class="text-muted my-2">
+                    {% if user.is_tutor %}
+                        <a href="{% url 'view_assessments' %}" class="nav-link {% if request.resolver_match.url_name == 'view_assessments' %}active{% endif %}">
+                            <i class="fas fa-tasks me-2"></i>Assessments
+                        </a>
+                        <a href="{% url 'manage_marks' %}" class="nav-link {% if request.resolver_match.url_name == 'manage_marks' %}active{% endif %}">
+                            <i class="fas fa-star me-2"></i>Manage Marks
+                        </a>
+                    {% else %}
+                        <a href="{% url 'view_assessments' %}" class="nav-link {% if request.resolver_match.url_name == 'view_assessments' %}active{% endif %}">
+                            <i class="fas fa-tasks me-2"></i>Assessments
+                        </a>
+                        <a href="{% url 'view_marks' %}" class="nav-link {% if request.resolver_match.url_name == 'view_marks' %}active{% endif %}">
+                            <i class="fas fa-star me-2"></i>Your Marks
+                        </a>
+                    {% endif %}
+                    <a href="{% url 'view_timetable_all' %}" class="nav-link {% if request.resolver_match.url_name == 'view_timetable_all' %}active{% endif %}">
+                        <i class="fas fa-calendar-alt me-2"></i>Your Timetable
+                    </a>
+                    <a href="{% url 'view_announcements_all' %}" class="nav-link {% if request.resolver_match.url_name == 'view_announcements_all' %}active{% endif %}">
+                        <i class="fas fa-bullhorn me-2"></i>Your Announcements
+                    </a>
+                    
+                    {% if user.is_tutor %}
+                        <!-- Create Links for Tutors -->
+                        <hr class="text-muted my-2">
+                        <button type="button" class="nav-link w-100 text-start" data-bs-toggle="modal" data-bs-target="#createAssessmentModal">
+                            <i class="fas fa-plus-circle me-2"></i>Create Assessment
+                        </button>
+                        <button type="button" class="nav-link w-100 text-start" data-bs-toggle="modal" data-bs-target="#createTimetableModal">
+                            <i class="fas fa-plus-circle me-2"></i>Create Timetable
+                        </button>
+                        <button type="button" class="nav-link w-100 text-start" data-bs-toggle="modal" data-bs-target="#createAnnouncementModal">
+                            <i class="fas fa-plus-circle me-2"></i>Create Announcement
+                        </button>
+                        
+                        <!-- Student Management -->
+                        <hr class="text-muted my-2">
+                        <a href="{% url 'student_list' %}" class="nav-link {% if request.resolver_match.url_name == 'student_list' %}active{% endif %}">
+                            <i class="fas fa-users me-2"></i>Manage Students
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Main Content -->
+            <div class="col-md-9 col-lg-10 main-content">
+        {% endif %}
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        {% block content %}
+        {% endblock %}
+
+        {% if user.is_authenticated %}
+            </div>
+        </div>
+        {% endif %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Initialize all modals with improved performance
+        document.addEventListener('DOMContentLoaded', function() {
+            var modals = document.querySelectorAll('.modal');
+            modals.forEach(function(modal) {
+                new bootstrap.Modal(modal, {
+                    backdrop: 'static',  // Prevents closing on backdrop click
+                    keyboard: true,      // Allows closing with Esc key
+                    focus: true         // Autofocus first form element
+                });
+            });
+        });
+    </script>
+
+    {% if user.is_authenticated and user.is_tutor %}
+    <!-- Create Assessment Modal -->
+    <div class="modal fade" id="createAssessmentModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Assessment</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" action="{% url 'create_assessment' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3" required></textarea>
+                        </div>
+                        <div class="mb-3">
+                            <label for="subject" class="form-label">Subject</label>
+                            <input type="text" class="form-control" id="subject" name="subject" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="max_marks" class="form-label">Maximum Marks</label>
+                            <input type="number" class="form-control" id="max_marks" name="max_marks" min="0" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="date" class="form-label">Date</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Assessment</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Create Timetable Modal -->
+<div class="modal fade" id="createTimetableModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Timetable Entry</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" action="{% url 'create_timetable' %}">
+                <div class="modal-body">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="subject" class="form-label">Subject</label>
+                        <input type="text" class="form-control" id="subject" name="subject" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="day" class="form-label">Day</label>
+                        <select class="form-select" id="day" name="day" required>
+                            <option value="MON">Monday</option>
+                            <option value="TUE">Tuesday</option>
+                            <option value="WED">Wednesday</option>
+                            <option value="THU">Thursday</option>
+                            <option value="FRI">Friday</option>
+                            <option value="SAT">Saturday</option>
+                            <option value="SUN">Sunday</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="start_time" class="form-label">Start Time</label>
+                        <input type="time" class="form-control" id="start_time" name="start_time" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="end_time" class="form-label">End Time</label>
+                        <input type="time" class="form-control" id="end_time" name="end_time" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="submit" class="btn btn-success">Create Timetable Entry</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+    <!-- Create Announcement Modal -->
+    <div class="modal fade" id="createAnnouncementModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Create New Announcement</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <form method="post" action="{% url 'create_announcement' %}">
+                    {% csrf_token %}
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="content" class="form-label">Content</label>
+                            <textarea class="form-control" id="content" name="content" rows="4" required></textarea>
+                        </div>
+                        <div class="mb-3 form-check">
+                            <input type="checkbox" class="form-check-input" id="important" name="important">
+                            <label class="form-check-label" for="important">Mark as Important</label>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" class="btn btn-primary">Create Announcement</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    {% endif %}
+</body>
+</html>

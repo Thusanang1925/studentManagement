@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Welcome to Student Management System{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-8 text-center">
+            <h1 class="display-4 mb-4">Welcome to Student Management System</h1>
+            <p class="lead mb-5">A comprehensive platform for managing student assessments, timetables, and announcements.</p>
+
+            {% if user.is_authenticated %}
+                {% if user.is_tutor %}
+                    <div class="alert alert-success">
+                        <h4 class="alert-heading">Welcome, {{ user.get_full_name }}!</h4>
+                        <p>You are logged in as a tutor. Access your dashboard to manage students, assessments, and announcements.</p>
+                    </div>
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+                {% else %}
+                    <div class="alert alert-info">
+                        <h4 class="alert-heading">Welcome, {{ user.get_full_name }}!</h4>
+                        <p>You are logged in as a student. Access your dashboard to view your assessments, marks, and timetable.</p>
+                    </div>
+                    <a href="{% url 'home' %}" class="btn btn-primary btn-lg">Go to Dashboard</a>
+                {% endif %}
+            {% else %}
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h3>For Students</h3>
+                                <p>Access your assessments, view marks, and check your timetable.</p>
+                                <a href="{% url 'register_student' %}" class="btn btn-primary">Register as Student</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h3>For Tutors</h3>
+                                <p>Manage students, create assessments, and post announcements.</p>
+                                <a href="{% url 'register_tutor' %}" class="btn btn-success">Register as Tutor</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <p>Already have an account?</p>
+                    <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">Login</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

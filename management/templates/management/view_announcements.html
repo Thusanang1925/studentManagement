@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block title %}View Announcements{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-info text-white d-flex justify-content-between align-items-center">
+        <h4 class="mb-0">{% if is_tutor %}Your Created Announcements{% else %}All Announcements{% endif %}</h4>
+        {% if is_tutor %}
+            <button type="button" class="btn btn-light" data-bs-toggle="modal" data-bs-target="#createAnnouncementModal">
+                <i class="fas fa-plus me-2"></i>Create Announcement
+            </button>
+        {% endif %}
+    </div>
+    <div class="card-body">
+        {% if announcements %}
+            <div class="list-group">
+                {% for announcement in announcements %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between mb-2">
+                            <h5 class="mb-1">{{ announcement.title }}</h5>
+                            <small class="text-muted">{{ announcement.date_posted|date:"F j, Y" }}</small>
+                        </div>
+                        <p class="mb-1">{{ announcement.content }}</p>
+                        <div class="d-flex justify-content-between align-items-center mt-2">
+                            <small class="text-muted">Posted by: {{ announcement.tutor.user.get_full_name }}</small>
+                            {% if is_tutor and announcement.tutor.user == user %}
+                                <div class="btn-group">
+                                    <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editAnnouncementModal{{ announcement.id }}">
+                                        <i class="fas fa-edit me-1"></i> Edit
+                                    </button>
+                                    <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteAnnouncementModal{{ announcement.id }}">
+                                        <i class="fas fa-trash me-1"></i> Delete
+                                    </button>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="text-muted">No announcements available yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Edit Announcement Modals -->
+{% for announcement in announcements %}
+    {% if is_tutor and announcement.tutor.user == user %}
+        <div class="modal fade" id="editAnnouncementModal{{ announcement.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Edit Announcement</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <form method="post" action="{% url 'edit_announcement' announcement.id %}">
+                        {% csrf_token %}
+                        <div class="modal-body">
+                            <div class="mb-3">
+                                <label for="title{{ announcement.id }}" class="form-label">Title</label>
+                                <input type="text" class="form-control" id="title{{ announcement.id }}" name="title" value="{{ announcement.title }}" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="content{{ announcement.id }}" class="form-label">Content</label>
+                                <textarea class="form-control" id="content{{ announcement.id }}" name="content" rows="4" required>{{ announcement.content }}</textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Delete Announcement Modal -->
+        <div class="modal fade" id="deleteAnnouncementModal{{ announcement.id }}" tabindex="-1">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title">Delete Announcement</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Are you sure you want to delete the announcement "{{ announcement.title }}"? This action cannot be undone.</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <form method="post" action="{% url 'delete_announcement' announcement.id %}" class="d-inline">
+                            {% csrf_token %}
+                            <button type="submit" class="btn btn-danger">
+                                <i class="fas fa-trash-alt me-1"></i> Delete Announcement
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endfor %}
+{% endblock %}

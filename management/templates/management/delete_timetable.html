@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Timetable Entry{% endblock %}
+
+{% block content %}
+<div class="card">
+    <div class="card-header bg-danger text-white">
+        <h4 class="mb-0">Delete Timetable Entry</h4>
+    </div>
+    <div class="card-body">
+        <p class="lead">Are you sure you want to delete this timetable entry?</p>
+        <div class="card mb-3">
+            <div class="card-body">
+                <h5 class="card-title">{{ timeslot.subject }}</h5>
+                <p class="card-text">
+                    <strong>Day:</strong> {{ timeslot.get_day_display }}<br>
+                    <strong>Time:</strong> {{ timeslot.start_time|time:"g:i A" }} - {{ timeslot.end_time|time:"g:i A" }}<br>
+                    <strong>Students:</strong>
+                    {% for student in timeslot.students.all %}
+                        <span class="badge bg-info">{{ student.user.get_full_name }}</span>
+                    {% empty %}
+                        <span class="text-muted">No students assigned</span>
+                    {% endfor %}
+                </p>
+            </div>
+        </div>
+        <form method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-danger">
+                <i class="fas fa-trash me-2"></i>Delete Entry
+            </button>
+            <a href="{% url 'view_timetable_all' %}" class="btn btn-secondary">
+                <i class="fas fa-times me-2"></i>Cancel
+            </a>
+        </form>
+    </div>
+</div>
+{% endblock %}

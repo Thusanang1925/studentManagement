@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block title %}Edit Student{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-warning">
+                <h4 class="mb-0">Edit Student Information</h4>
+            </div>
+            <div class="card-body">
+                <form method="post" novalidate>
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label class="form-label">Student Name</label>
+                        <input type="text" class="form-control" value="{{ student.user.get_full_name }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Student ID</label>
+                        <input type="text" class="form-control" value="{{ student.student_id }}" disabled>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">Phone Number</label>
+                        <input type="tel" name="phone" id="phone" class="form-control" value="{{ student.phone }}" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="address" class="form-label">Address</label>
+                        <textarea name="address" id="address" class="form-control" rows="3" required>{{ student.address }}</textarea>
+                    </div>
+                    <div class="d-grid gap-2">
+                        <button type="submit" class="btn btn-warning">Update Information</button>
+                        <a href="{% url 'student_list' %}" class="btn btn-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
